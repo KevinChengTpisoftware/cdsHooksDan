@@ -219,7 +219,11 @@
   }
 
   function onCredentialResponse(response) {
-    var payload = JSON.parse(atob(response.credential.split('.')[1]));
+    var b64 = response.credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+    var raw = atob(b64);
+    var bytes = new Uint8Array(raw.length);
+    for (var i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+    var payload = JSON.parse(new TextDecoder().decode(bytes));
     showWelcome(payload.name, payload.email, payload.picture);
   }
 
