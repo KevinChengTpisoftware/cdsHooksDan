@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DigiCare CDS — Demo Login</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    :root {
+      --c-primary: #1565c0;
+      --c-primary-dark: #0d47a1;
+      --c-bg: #e8eef5;
+      --c-surface: #ffffff;
+      --c-text: #1a1a2e;
+      --c-muted: #6c757d;
+      --c-border: #cfd8dc;
+      --c-success: #2e7d32;
+      --c-success-bg: #e8f5e9;
+      --radius: 10px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+      background: var(--c-bg);
+      color: var(--c-text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .topbar {
+      background: var(--c-primary);
+      color: #fff;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    }
+    .topbar .logo {
+      width: 44px; height: 44px;
+      background: #fff; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; flex-shrink: 0;
+    }
+    .topbar h1 { font-size: 1.25rem; font-weight: 600; }
+    .topbar .subtitle { font-size: .8rem; opacity: .8; }
+    .topbar .user-area {
+      margin-left: auto;
+      display: flex; align-items: center; gap: .75rem;
+    }
+    .topbar .user-area img {
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.5);
+    }
+    .topbar .user-area .user-name { font-size: .9rem; font-weight: 500; }
+    .topbar .logout-btn {
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.3);
+      color: #fff; padding: .35rem .8rem;
+      border-radius: 6px; cursor: pointer; font-size: .8rem;
+    }
+    .topbar .logout-btn:hover { background: rgba(255,255,255,.25); }
+    .main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+    .login-card {
+      background: var(--c-surface); border-radius: var(--radius);
+      box-shadow: 0 4px 24px rgba(0,0,0,.1);
+      padding: 2.5rem 2rem; width: 100%; max-width: 420px; text-align: center;
+    }
+    .login-card .icon {
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, var(--c-primary), var(--c-primary-dark));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.25rem; font-size: 2rem; color: #fff;
+    }
+    .login-card h2 { font-size: 1.3rem; margin-bottom: .4rem; }
+    .login-card .desc { color: var(--c-muted); font-size: .9rem; margin-bottom: 2rem; line-height: 1.5; }
+    .google-btn {
+      display: inline-flex; align-items: center; gap: .6rem;
+      background: var(--c-surface); border: 2px solid var(--c-border);
+      border-radius: 8px; padding: .75rem 1.5rem;
+      font-size: 1rem; font-weight: 500; color: var(--c-text);
+      cursor: pointer; transition: all .2s; width: 100%; justify-content: center;
+    }
+    .google-btn:hover { border-color: var(--c-primary); box-shadow: 0 2px 8px rgba(21,101,192,.15); }
+    .google-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+    .login-card .note { margin-top: 1.5rem; font-size: .78rem; color: var(--c-muted); line-height: 1.4; }
+    .welcome-card {
+      background: var(--c-surface); border-radius: var(--radius);
+      box-shadow: 0 4px 24px rgba(0,0,0,.1);
+      padding: 2.5rem 2rem; width: 100%; max-width: 520px; text-align: center;
+    }
+    .welcome-card .avatar {
+      width: 80px; height: 80px; border-radius: 50%;
+      border: 3px solid var(--c-primary); margin: 0 auto 1rem;
+    }
+    .welcome-card h2 { font-size: 1.4rem; margin-bottom: .3rem; }
+    .welcome-card .email-text { color: var(--c-muted); font-size: .9rem; margin-bottom: 1.5rem; }
+    .welcome-card .status-badge {
+      display: inline-block; background: var(--c-success-bg); color: var(--c-success);
+      padding: .4rem 1rem; border-radius: 20px; font-size: .85rem; font-weight: 500; margin-bottom: 1.5rem;
+    }
+    .welcome-card .info-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: .75rem;
+      text-align: left; margin-bottom: 1.5rem;
+    }
+    .welcome-card .info-item { background: var(--c-bg); padding: .75rem 1rem; border-radius: 8px; }
+    .welcome-card .info-item .label { font-size: .75rem; color: var(--c-muted); margin-bottom: .2rem; }
+    .welcome-card .info-item .value { font-size: .9rem; font-weight: 500; }
+    .footer { text-align: center; padding: 1rem; font-size: .75rem; color: var(--c-muted); }
+    [hidden] { display: none !important; }
+    @media (max-width: 500px) {
+      .login-card, .welcome-card { padding: 2rem 1.25rem; }
+      .topbar { padding: .75rem 1rem; }
+      .topbar h1 { font-size: 1.05rem; }
+      .welcome-card .info-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">&#x2695;</div>
+  <div>
+    <h1>DigiCare Hospital</h1>
+    <div class="subtitle">Clinical Decision Support System — Demo</div>
+  </div>
+  <div class="user-area" id="userArea" hidden>
+    <img id="topAvatar" src="" alt="">
+    <span class="user-name" id="topName"></span>
+    <button class="logout-btn" onclick="handleLogout()">登出</button>
+  </div>
+</div>
+
+<div class="main" id="loginView">
+  <div class="login-card">
+    <div class="icon">&#x2695;</div>
+    <h2>DigiCare CDS Demo</h2>
+    <p class="desc">臨床決策支援系統展示<br>請使用 Google 帳號登入</p>
+    <button class="google-btn" onclick="handleLogin()">
+      <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.1 24.1 0 0 0 0 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      使用 Google 帳號登入
+    </button>
+    <p class="note">本系統僅供展示用途 (Demo Only)<br>登入由 Google OAuth 2.0 處理，本站不儲存密碼</p>
+  </div>
+</div>
+
+<div class="main" id="welcomeView" hidden>
+  <div class="welcome-card">
+    <img class="avatar" id="avatar" src="" alt="">
+    <h2 id="welcomeName"></h2>
+    <p class="email-text" id="welcomeEmail"></p>
+    <div class="status-badge">&#x2714; 已驗證登入</div>
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="label">系統角色</div>
+        <div class="value">臨床醫師</div>
+      </div>
+      <div class="info-item">
+        <div class="label">所屬科別</div>
+        <div class="value">一般內科</div>
+      </div>
+      <div class="info-item">
+        <div class="label">登入時間</div>
+        <div class="value" id="loginTime"></div>
+      </div>
+      <div class="info-item">
+        <div class="label">CDS 狀態</div>
+        <div class="value" style="color:var(--c-success)">&#x25CF; 連線中</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">DigiCare Hospital — Clinical Decision Support System (Demo)</div>
+
+<script>
+  // ============================================
+  // 將下方 YOUR_CLIENT_ID 替換為你的 Google OAuth Client ID
+  // ============================================
+  var CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com';
+
+  var tokenClient;
+
+  window.onload = function () {
+    if (typeof google === 'undefined') return;
+    google.accounts.id.initialize({
+      client_id: CLIENT_ID,
+      callback: onCredentialResponse,
+      auto_select: false,
+    });
+    tokenClient = google.accounts.oauth2.initTokenFlow({
+      client_id: CLIENT_ID,
+      scope: 'openid profile email',
+      callback: '',
+    });
+  };
+
+  function handleLogin() {
+    if (CLIENT_ID.indexOf('YOUR_') === 0) {
+      alert('Please set your Google OAuth Client ID first.');
+      return;
+    }
+    google.accounts.id.prompt(function (notification) {
+      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+        tokenClient.callback = function (resp) {
+          if (resp.error) return;
+          fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: { Authorization: 'Bearer ' + resp.access_token },
+          })
+            .then(function (r) { return r.json(); })
+            .then(function (profile) {
+              showWelcome(profile.name, profile.email, profile.picture);
+            });
+        };
+        tokenClient.requestAccessToken({ prompt: 'select_account' });
+      }
+    });
+  }
+
+  function onCredentialResponse(response) {
+    var payload = JSON.parse(atob(response.credential.split('.')[1]));
+    showWelcome(payload.name, payload.email, payload.picture);
+  }
+
+  function showWelcome(name, email, picture) {
+    document.getElementById('loginView').hidden = true;
+    document.getElementById('welcomeView').hidden = false;
+    document.getElementById('userArea').hidden = false;
+    document.getElementById('welcomeName').textContent = name;
+    document.getElementById('welcomeEmail').textContent = email;
+    document.getElementById('avatar').src = picture;
+    document.getElementById('topAvatar').src = picture;
+    document.getElementById('topName').textContent = name;
+    var now = new Date();
+    document.getElementById('loginTime').textContent =
+      now.toLocaleDateString('zh-TW') + ' ' + now.toLocaleTimeString('zh-TW');
+  }
+
+  function handleLogout() {
+    if (typeof google !== 'undefined') google.accounts.id.disableAutoSelect();
+    document.getElementById('loginView').hidden = false;
+    document.getElementById('welcomeView').hidden = true;
+    document.getElementById('userArea').hidden = true;
+  }
+</script>
+
+</body>
+</html>
