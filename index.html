@@ -128,9 +128,21 @@ window.onload=function(){
   if(typeof google==='undefined')return;
   google.accounts.id.initialize({client_id:GCID,callback:onCred,auto_select:true});
   try{tokenClient=google.accounts.oauth2.initTokenClient({client_id:GCID,scope:'openid profile email',callback:''});}catch(e){}
-  if(sessionStorage.getItem('ehr_launched')){restoreUser();showStage(3);fetchData();sessionStorage.removeItem('ehr_launched');autoIdentify();return;}
+  
   var ps=new URLSearchParams(location.search);
-  if(ps.has('code')||ps.has('state')){restoreUser();showStage(3);fetchData();autoIdentify();return;}
+  var isCallback=sessionStorage.getItem('ehr_launched')||ps.has('code')||ps.has('state');
+  if(isCallback){
+    sessionStorage.removeItem('ehr_launched');restoreUser();showStage(3);fetchData();
+    if(!sessionStorage.getItem('uname')){try{FHIR.oauth2.ready().then(function(cl){
+      var idt=(cl.state.tokenResponse||{}).id_token;
+      if(idt){var b=idt.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+        var raw=atob(b);var bytes=new Uint8Array(raw.length);
+        for(var i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
+        var u=JSON.parse(new TextDecoder().decode(bytes));
+        saveUser(u.name||u.sub,u.email||'',u.picture||'');}
+    }).catch(function(){});}catch(e){}}
+    return;
+  }
   if(sessionStorage.getItem('uname')){restoreUser();showStage(2);}
 };
 
@@ -171,16 +183,6 @@ function showStage(s){
   document.getElementById('stage3').hidden=(s!==3);
 }
 
-function autoIdentify(){
-  if(sessionStorage.getItem('uname'))return;
-  if(!tokenClient)return;
-  tokenClient.callback=function(resp){
-    if(resp.error)return;
-    fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+resp.access_token}})
-    .then(function(r){return r.json()}).then(function(p){saveUser(p.name,p.email,p.picture);});
-  };
-  tokenClient.requestAccessToken({prompt:'select_account'});
-}
 function doLaunch(){
   var btn=document.querySelector('#stage2 .btn-p'),st=document.getElementById('lstat');
   btn.disabled=true;st.textContent='Requesting launch code...';
