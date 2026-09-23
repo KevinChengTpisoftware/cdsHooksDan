@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DigiCare CDS</title>
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/fhirclient/build/fhir-client.js"></script>
+</head>
+<body>
+
+<!-- Topbar -->
+<div class="app-topbar">
+  <div class="logo">&#x2695;</div>
+  <span class="title">DigiCare CDS</span>
+  <div class="spacer"></div>
+  <div class="user-area" id="userArea" hidden>
+    <img id="userAvatar" src="" alt="">
+    <span id="userName">-</span>
+    <button class="logout-btn" onclick="doLogout()">Logout</button>
+  </div>
+</div>
+
+<!-- 3-column body -->
+<div class="app-body">
+
+  <!-- Left: patient list -->
+  <div class="panel-left">
+    <div class="panel-header">Patients</div>
+    <div class="patient-list" id="patientList">
+      <div class="loading-center"><div class="spinner"></div><p>Loading...</p></div>
+    </div>
+  </div>
+
+  <!-- Center: patient detail -->
+  <div class="panel-center" id="centerPanel">
+    <div class="loading-center" style="padding-top:30vh;">
+      <p>Select a patient from the list</p>
+    </div>
+  </div>
+
+  <!-- Right: CDS cards chat -->
+  <div class="panel-right">
+    <div class="panel-header"><span class="dot"></span> CDS Cards</div>
+    <div class="chat-feed" id="chatFeed">
+      <div class="chat-empty">
+        <div>
+          <p>CDS Hook cards will appear here when a patient is selected.</p>
+          <p style="margin-top:.5rem;font-size:.75rem;color:var(--text-muted)">M2: Coming soon</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Danmaku layer (M2 placeholder) -->
+<div class="danmaku-layer" id="danmakuLayer"></div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
