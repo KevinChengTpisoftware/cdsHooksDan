@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>DigiCare CDS</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://cdn.jsdelivr.net/npm/fhirclient/build/fhir-client.js"></script>
 <style>
 :root{--p:#1565c0;--pd:#0d47a1;--bg:#e8eef5;--s:#fff;--t:#1a1a2e;--m:#6c757d;--b:#dee2e6;--ok:#2e7d32;--r:10px}
@@ -12,15 +13,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Noto Sans T
 .topbar .logo{width:44px;height:44px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem}
 .topbar h1{font-size:1.25rem;font-weight:600}
 .topbar .sub{font-size:.8rem;opacity:.8}
-.topbar .right{margin-left:auto;font-size:.85rem}
+.topbar .uarea{margin-left:auto;display:flex;align-items:center;gap:.75rem}
+.topbar .uarea img{width:36px;height:36px;border-radius:50%;border:2px solid rgba(255,255,255,.5)}
+.topbar .uarea span{font-size:.9rem;font-weight:500}
 .ct{max-width:960px;margin:0 auto;padding:2rem 1.5rem}
 .card{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,.05)}
 .card h2{font-size:1.15rem;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid var(--p);color:var(--p)}
-.ls{text-align:center;padding:2rem}
-.ls p{color:var(--m);margin-bottom:1.5rem;line-height:1.6}
-.lb{display:inline-flex;align-items:center;gap:.6rem;background:var(--p);color:#fff;border:none;padding:.85rem 2rem;border-radius:8px;font-size:1.05rem;font-weight:600;cursor:pointer;transition:all .2s}
-.lb:hover{background:var(--pd);box-shadow:0 4px 12px rgba(21,101,192,.3)}
-.lb:disabled{opacity:.5;cursor:not-allowed}
+.center{text-align:center;padding:2rem}
+.center p{color:var(--m);margin-bottom:1.5rem;line-height:1.6}
+.btn{display:inline-flex;align-items:center;gap:.6rem;border:none;padding:.75rem 1.5rem;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-p{background:var(--p);color:#fff}
+.btn-p:hover{background:var(--pd);box-shadow:0 4px 12px rgba(21,101,192,.3)}
+.btn-g{background:#fff;color:var(--t);border:2px solid var(--b)}
+.btn-g:hover{border-color:var(--p)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
 .cg{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem}
 .cg label{font-size:.8rem;color:var(--m);display:block;margin-bottom:.25rem}
 .cg input{width:100%;padding:.5rem .75rem;border:1px solid var(--b);border-radius:6px;font-size:.85rem;font-family:monospace}
@@ -36,8 +42,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Noto Sans T
 .tab{padding:.5rem 1rem;border:none;background:#eee;border-radius:8px;cursor:pointer;font-size:.85rem}
 .tab:hover{background:#ddd}
 .tab.active{background:var(--p);color:#fff}
-.tc{display:none}
-.tc.active{display:block}
+.tc{display:none}.tc.active{display:block}
 .ml{list-style:none;padding:0}
 .mi{padding:.75rem 1rem;background:var(--bg);border-radius:8px;margin-bottom:.5rem;border-left:4px solid var(--p)}
 .mn{font-weight:bold;margin-bottom:.25rem}
@@ -57,36 +62,45 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Noto Sans T
 <div class="topbar">
 <div class="logo">&#x2695;</div>
 <div><h1>DigiCare CDS</h1><div class="sub">Clinical Decision Support System</div></div>
-<div class="right" id="srvInfo"></div>
+<div class="uarea" id="uarea" hidden>
+<img id="topImg" src="" alt=""><span id="topName"></span>
+</div>
 </div>
 
-<div class="ct" id="lv">
+<div class="ct" id="stage1">
 <div class="card">
-<h2>EHR Launch</h2>
-<div class="ls">
-<p>SMART on FHIR EHR Launch Demo</p>
+<h2>Step 1 — Login</h2>
+<div class="center">
+<p>Please sign in with your Google account to continue.</p>
+<button class="btn btn-g" onclick="googleLogin()">
+<svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.1 24.1 0 0 0 0 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+Sign in with Google
+</button>
+<p style="margin-top:1.5rem;font-size:.78rem;color:var(--m)">Demo Only</p>
+</div>
+</div>
+</div>
+
+<div class="ct" id="stage2" hidden>
+<div class="card">
+<h2>Step 2 — EHR Launch</h2>
+<div class="center">
+<p>Initiate the SMART on FHIR EHR Launch flow.</p>
 <div class="cg" style="max-width:500px;margin:0 auto 1.5rem;text-align:left">
 <div><label>Patient ID</label><input id="cfgP" value="0d55bd98-dfdb-4357-8e7e-f863a0e60b75"></div>
 <div><label>Provider ID</label><input id="cfgR" value="429bf6ab-be0d-4b37-aaa0-f95e45762095"></div>
 <div><label>Client ID</label><input id="cfgC" value="cc344727-6f90-496c-94fd-c7829aa9a51d"></div>
 <div><label>User Type</label><input id="cfgU" value="practitioner"></div>
 </div>
-<button class="lb" onclick="doLaunch()">EHR Launch</button>
+<button class="btn btn-p" onclick="doLaunch()" style="margin-right:.5rem">EHR Launch</button>
+<button class="btn btn-g" onclick="skipToData()">Skip to Data</button>
 <p id="lstat" style="margin-top:1rem;font-size:.85rem"></p>
 </div>
 </div>
-<div class="card">
-<h2>Links</h2>
-<ul style="padding-left:1.5rem;line-height:2">
-<li><a href="https://cds-hooks.hl7.org/" target="_blank">CDS Hooks Spec</a></li>
-<li><a href="https://hl7.org/fhir/" target="_blank">HL7 FHIR</a></li>
-<li><a href="cors-test.html">CORS Test</a></li>
-</ul>
-</div>
 </div>
 
-<div class="ct" id="av" hidden>
-<div class="card"><h2>Patient</h2><div id="pi"><div style="text-align:center;padding:2rem"><div class="sp"></div></div></div></div>
+<div class="ct" id="stage3" hidden>
+<div class="card"><h2>Patient</h2><div id="pi"><div class="center"><div class="sp"></div></div></div></div>
 <div class="card">
 <div class="tabs">
 <button class="tab active" data-tab="med">Medications</button>
@@ -94,84 +108,138 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Noto Sans T
 <button class="tab" data-tab="obs">Observations</button>
 <button class="tab" data-tab="raw">Raw JSON</button>
 </div>
-<div id="med" class="tc active"><div style="text-align:center;padding:2rem"><div class="sp"></div></div></div>
-<div id="cond" class="tc"><div style="text-align:center;padding:2rem"><div class="sp"></div></div></div>
-<div id="obs" class="tc"><div style="text-align:center;padding:2rem"><div class="sp"></div></div></div>
+<div id="med" class="tc active"><div class="center"><div class="sp"></div></div></div>
+<div id="cond" class="tc"><div class="center"><div class="sp"></div></div></div>
+<div id="obs" class="tc"><div class="center"><div class="sp"></div></div></div>
 <div id="raw" class="tc"><div class="ds" id="rd">...</div></div>
 </div>
 </div>
 
-<div class="ft">DigiCare CDS - SMART on FHIR Demo</div>
+<div class="ft">DigiCare CDS &mdash; SMART on FHIR Demo</div>
+
 <script>
 var BASE='https://dgcare-dev.eapdd.tpisoftware.com';
 var ISS=BASE+'/smart-on-fhir/hapiTw';
+var GCID='908814122490-40ietk4r472uaatkj2kuh847suk19c48.apps.googleusercontent.com';
+var tokenClient=null;
+
+window.onload=function(){
+  if(typeof google==='undefined')return;
+  google.accounts.id.initialize({client_id:GCID,callback:onCred,auto_select:false});
+  try{tokenClient=google.accounts.oauth2.initTokenClient({client_id:GCID,scope:'openid profile email',callback:''});}catch(e){}
+  if(sessionStorage.getItem('ehr_launched')){restoreUser();showStage(3);fetchData();sessionStorage.removeItem('ehr_launched');return;}
+  var ps=new URLSearchParams(location.search);
+  if(ps.has('code')||ps.has('state')){restoreUser();showStage(3);fetchData();return;}
+  if(sessionStorage.getItem('uname')){restoreUser();showStage(2);}
+};
+
+function googleLogin(){
+  if(GCID.indexOf('PLACEHOLDER')===0){alert('Set Google OAuth Client ID');return;}
+  google.accounts.id.prompt(function(n){
+    if(n.isNotDisplayed()||n.isSkippedMoment()){
+      if(!tokenClient){alert('Token client unavailable');return;}
+      tokenClient.callback=function(resp){
+        if(resp.error)return;
+        fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+resp.access_token}})
+        .then(function(r){return r.json()}).then(function(p){saveUser(p.name,p.email,p.picture);showStage(2);});
+      };
+      tokenClient.requestAccessToken({prompt:'select_account'});
+    }
+  });
+}
+function onCred(response){
+  var b=response.credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+  var raw=atob(b);var bytes=new Uint8Array(raw.length);
+  for(var i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
+  var p=JSON.parse(new TextDecoder().decode(bytes));
+  saveUser(p.name,p.email,p.picture);showStage(2);
+}
+function saveUser(n,e,pic){
+  sessionStorage.setItem('uname',n);sessionStorage.setItem('uemail',e);sessionStorage.setItem('upic',pic);
+  document.getElementById('uarea').hidden=false;
+  document.getElementById('topImg').src=pic;document.getElementById('topName').textContent=n;
+}
+function restoreUser(){
+  var n=sessionStorage.getItem('uname'),pic=sessionStorage.getItem('upic');
+  if(n){document.getElementById('uarea').hidden=false;document.getElementById('topImg').src=pic||'';document.getElementById('topName').textContent=n;}
+}
+function showStage(s){
+  document.getElementById('stage1').hidden=(s!==1);
+  document.getElementById('stage2').hidden=(s!==2);
+  document.getElementById('stage3').hidden=(s!==3);
+}
 
 function doLaunch(){
-var b=document.querySelector('.lb');var st=document.getElementById('lstat');
-b.disabled=true;st.textContent='Requesting launch code...';
-var body='client_id='+encodeURIComponent(document.getElementById('cfgC').value)
-+'&patient='+encodeURIComponent(document.getElementById('cfgP').value)
-+'&provider='+encodeURIComponent(document.getElementById('cfgR').value)
-+'&user_type='+encodeURIComponent(document.getElementById('cfgU').value);
-fetch(BASE+'/dgrv4/ssotoken/smart/launch',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body})
-.then(function(r){return r.json()})
-.then(function(d){
-if(!d.launch)throw new Error('No launch code: '+JSON.stringify(d));
-st.textContent='Launch: '+d.launch+' - Redirecting...';
-window.location.href='launch.html?iss='+encodeURIComponent(ISS)+'&launch='+encodeURIComponent(d.launch);
-})
-.catch(function(e){st.innerHTML='<span style="color:#c62828">'+e.message+'</span>';b.disabled=false;});
+  var btn=document.querySelector('#stage2 .btn-p'),st=document.getElementById('lstat');
+  btn.disabled=true;st.textContent='Requesting launch code...';
+  sessionStorage.setItem('cfgP',document.getElementById('cfgP').value);
+  sessionStorage.setItem('cfgC',document.getElementById('cfgC').value);
+  var body='client_id='+encodeURIComponent(document.getElementById('cfgC').value)
+    +'&patient='+encodeURIComponent(document.getElementById('cfgP').value)
+    +'&provider='+encodeURIComponent(document.getElementById('cfgR').value)
+    +'&user_type='+encodeURIComponent(document.getElementById('cfgU').value);
+  fetch(BASE+'/dgrv4/ssotoken/smart/launch',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body})
+  .then(function(r){return r.json()}).then(function(d){
+    if(!d.launch)throw new Error('No launch code: '+JSON.stringify(d));
+    st.textContent='Launch: '+d.launch;
+    sessionStorage.setItem('ehr_launched','1');
+    location.href='launch.html?iss='+encodeURIComponent(ISS)+'&launch='+encodeURIComponent(d.launch);
+  }).catch(function(e){st.innerHTML='<span style="color:#c62828">'+e.message+'</span>';btn.disabled=false;});
+}
+function skipToData(){showStage(3);fetchData();}
+
+function fetchData(){
+  var cid=sessionStorage.getItem('cfgC')||'cc344727-6f90-496c-94fd-c7829aa9a51d';
+  var pid=sessionStorage.getItem('cfgP')||'0d55bd98-dfdb-4357-8e7e-f863a0e60b75';
+  fetch(BASE+'/dgrv4/ssotoken/smart/token',{
+    method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},
+    body:'grant_type=client_credentials&client_id='+encodeURIComponent(cid)+'&client_secret=79f04b56b33491716c0880af72cdef7d3f0629111421cedd18353651cd313d9e'
+  }).then(function(r){return r.json()}).then(function(tok){
+    if(!tok.access_token)throw new Error('No token: '+JSON.stringify(tok));
+    var hdr={Authorization:'Bearer '+tok.access_token};
+    fetch(ISS+'/Patient/'+pid,{headers:hdr}).then(function(r){return r.json()}).then(rp).catch(function(e){document.getElementById('pi').innerHTML='<div class="err">'+e.message+'</div>';});
+    fetch(ISS+'/MedicationRequest?patient='+pid,{headers:hdr}).then(function(r){return r.json()}).then(function(d){
+      rl('med',d.entry,function(r){return(r.medicationCodeableConcept&&(r.medicationCodeableConcept.text||(r.medicationCodeableConcept.coding&&r.medicationCodeableConcept.coding[0].display)))||'Unknown'},
+      function(r){return'Status: '+(r.status||'N/A')+' | '+fd(r.authoredOn)});
+    }).catch(function(e){document.getElementById('med').innerHTML='<div class="err">'+e.message+'</div>';});
+    fetch(ISS+'/Condition?patient='+pid,{headers:hdr}).then(function(r){return r.json()}).then(function(d){
+      rl('cond',d.entry,function(r){return(r.code&&(r.code.text||(r.code.coding&&r.code.coding[0]&&r.code.coding[0].display)))||'Unknown'},
+      function(r){var st=r.clinicalStatus&&r.clinicalStatus.coding&&r.clinicalStatus.coding[0]?r.clinicalStatus.coding[0].code:'N/A';return'Status: '+st+' | '+fd(r.onsetDateTime)});
+    }).catch(function(e){document.getElementById('cond').innerHTML='<div class="err">'+e.message+'</div>';});
+    fetch(ISS+'/Observation?patient='+pid+'&_count=20',{headers:hdr}).then(function(r){return r.json()}).then(function(d){
+      rl('obs',d.entry,function(r){return(r.code&&(r.code.text||(r.code.coding&&r.code.coding[0]&&r.code.coding[0].display)))||'Unknown'},
+      function(r){var v='N/A';if(r.valueQuantity)v=r.valueQuantity.value+' '+(r.valueQuantity.unit||'');else if(r.valueString)v=r.valueString;return'Value: '+v+' | '+fd(r.effectiveDateTime)});
+    }).catch(function(e){document.getElementById('obs').innerHTML='<div class="err">'+e.message+'</div>';});
+  }).catch(function(e){document.getElementById('pi').innerHTML='<div class="err">Token error: '+e.message+'</div>';});
 }
 
 document.querySelectorAll('.tab').forEach(function(t){
-t.addEventListener('click',function(){
-document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active')});
-document.querySelectorAll('.tc').forEach(function(x){x.classList.remove('active')});
-this.classList.add('active');
-document.getElementById(this.dataset.tab).classList.add('active');
-});
+  t.addEventListener('click',function(){
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active')});
+    document.querySelectorAll('.tc').forEach(function(x){x.classList.remove('active')});
+    this.classList.add('active');document.getElementById(this.dataset.tab).classList.add('active');
+  });
 });
 
 function fd(d){if(!d)return'N/A';try{return new Date(d).toLocaleDateString('zh-TW')}catch(e){return d}}
 function age(b){if(!b)return'N/A';return(new Date().getFullYear()-new Date(b).getFullYear())+' y/o'}
 function gn(p){if(!p.name||!p.name.length)return'Unknown';var n=p.name[0];if(n.text)return n.text;var r=[];if(n.family)r.push(n.family);if(n.given)r=r.concat(n.given);return r.join(' ')||'Unknown'}
-
 function rp(p){
-var n=gn(p);
-document.getElementById('pi').innerHTML=
-'<div class="ph"><div class="av">'+n.charAt(0)+'</div><div><div class="pn">'+n+'</div><div class="pm">ID: '+(p.id||'N/A')+'</div></div></div>'+
-'<div class="ig">'+
-'<div class="ii"><div class="il">Birthday</div><div class="iv">'+fd(p.birthDate)+'</div></div>'+
-'<div class="ii"><div class="il">Age</div><div class="iv">'+age(p.birthDate)+'</div></div>'+
-'<div class="ii"><div class="il">Gender</div><div class="iv">'+(p.gender||'N/A')+'</div></div>'+
-'</div>';
+  var n=gn(p);
+  document.getElementById('pi').innerHTML=
+    '<div class="ph"><div class="av">'+n.charAt(0)+'</div><div><div class="pn">'+n+'</div><div class="pm">ID: '+(p.id||'N/A')+'</div></div></div>'+
+    '<div class="ig">'+
+    '<div class="ii"><div class="il">Birthday</div><div class="iv">'+fd(p.birthDate)+'</div></div>'+
+    '<div class="ii"><div class="il">Age</div><div class="iv">'+age(p.birthDate)+'</div></div>'+
+    '<div class="ii"><div class="il">Gender</div><div class="iv">'+(p.gender||'N/A')+'</div></div></div>';
+  document.getElementById('rd').textContent=JSON.stringify(p,null,2);
 }
-
 function rl(cid,entries,nf,df){
-var c=document.getElementById(cid);
-if(!entries||!entries.length){c.innerHTML='<div class="nd">No records</div>';return}
-var h='<ul class="ml">';
-entries.forEach(function(e){h+='<li class="mi"><div class="mn">'+nf(e.resource)+'</div><div class="md">'+df(e.resource)+'</div></li>'});
-c.innerHTML=h+'</ul>';
-}
-
-var ps=new URLSearchParams(window.location.search);
-if(ps.has('code')||ps.has('state')){
-document.getElementById('lv').hidden=true;
-document.getElementById('av').hidden=false;
-FHIR.oauth2.ready().then(function(cl){
-document.getElementById('srvInfo').innerHTML='<span class="sb">Connected</span> '+(cl.state.serverUrl||'');
-cl.patient.read().then(function(p){rp(p);document.getElementById('rd').textContent=JSON.stringify(p,null,2)},function(e){document.getElementById('pi').innerHTML='<div class="err">'+e.message+'</div>'});
-cl.request('/MedicationRequest?patient='+cl.patient.id).then(function(d){
-rl('med',d.entry,function(r){return(r.medicationCodeableConcept&&(r.medicationCodeableConcept.text||(r.medicationCodeableConcept.coding&&r.medicationCodeableConcept.coding[0].display)))||'Unknown'},
-function(r){return'Status: '+(r.status||'N/A')+' | '+fd(r.authoredOn)})},function(e){document.getElementById('med').innerHTML='<div class="err">'+e.message+'</div>'});
-cl.request('/Condition?patient='+cl.patient.id).then(function(d){
-rl('cond',d.entry,function(r){return(r.code&&(r.code.text||(r.code.coding&&r.code.coding[0]&&r.code.coding[0].display)))||'Unknown'},
-function(r){var s=r.clinicalStatus&&r.clinicalStatus.coding&&r.clinicalStatus.coding[0]?r.clinicalStatus.coding[0].code:'N/A';return'Status: '+s+' | '+fd(r.onsetDateTime)})},function(e){document.getElementById('cond').innerHTML='<div class="err">'+e.message+'</div>'});
-cl.request('/Observation?patient='+cl.patient.id+'&_count=20').then(function(d){
-rl('obs',d.entry,function(r){return(r.code&&(r.code.text||(r.code.coding&&r.code.coding[0]&&r.code.coding[0].display)))||'Unknown'},
-function(r){var v='N/A';if(r.valueQuantity)v=r.valueQuantity.value+' '+(r.valueQuantity.unit||'');else if(r.valueString)v=r.valueString;return'Value: '+v+' | '+fd(r.effectiveDateTime)})},function(e){document.getElementById('obs').innerHTML='<div class="err">'+e.message+'</div>'});
-}).catch(function(e){document.getElementById('av').innerHTML='<div class="card"><div class="err"><h3>Auth Failed</h3><p>'+e.message+'</p><p><a href="index.html">Back</a></p></div></div>'});
+  var c=document.getElementById(cid);
+  if(!entries||!entries.length){c.innerHTML='<div class="nd">No records</div>';return;}
+  var h='<ul class="ml">';
+  entries.forEach(function(e){h+='<li class="mi"><div class="mn">'+nf(e.resource)+'</div><div class="md">'+df(e.resource)+'</div></li>';});
+  c.innerHTML=h+'</ul>';
 }
 </script>
 </body>
