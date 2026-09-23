@@ -64,6 +64,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Noto Sans T
 <div><h1>DigiCare CDS</h1><div class="sub">Clinical Decision Support System</div></div>
 <div class="uarea" id="uarea" hidden>
 <img id="topImg" src="" alt=""><span id="topName"></span>
+<button onclick="doLogout()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:.35rem .8rem;border-radius:6px;cursor:pointer;font-size:.8rem;margin-left:.5rem">Logout</button>
 </div>
 </div>
 
@@ -141,7 +142,7 @@ function googleLogin(){
       tokenClient.callback=function(resp){
         if(resp.error)return;
         fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+resp.access_token}})
-        .then(function(r){return r.json()}).then(function(p){saveUser(p.name,p.email,p.picture);showStage(2);});
+        .then(function(r){return r.json()}).then(function(p){saveUser(p.name,p.email,p.picture);doLaunch();});
       };
       tokenClient.requestAccessToken({prompt:'select_account'});
     }
@@ -152,7 +153,7 @@ function onCred(response){
   var raw=atob(b);var bytes=new Uint8Array(raw.length);
   for(var i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
   var p=JSON.parse(new TextDecoder().decode(bytes));
-  saveUser(p.name,p.email,p.picture);showStage(2);
+  saveUser(p.name,p.email,p.picture);doLaunch();
 }
 function saveUser(n,e,pic){
   sessionStorage.setItem('uname',n);sessionStorage.setItem('uemail',e);sessionStorage.setItem('upic',pic);
@@ -186,14 +187,16 @@ function doLaunch(){
     location.href='launch.html?iss='+encodeURIComponent(ISS)+'&launch='+encodeURIComponent(d.launch);
   }).catch(function(e){st.innerHTML='<span style="color:#c62828">'+e.message+'</span>';btn.disabled=false;});
 }
+function doLogout(){sessionStorage.clear();if(typeof google!=="undefined")google.accounts.id.disableAutoSelect();document.getElementById("uarea").hidden=true;showStage(1);history.replaceState(null,"",location.pathname);}
 function skipToData(){showStage(3);fetchData();}
 
 function fetchData(){
   var cid=sessionStorage.getItem('cfgC')||'cc344727-6f90-496c-94fd-c7829aa9a51d';
   var pid=sessionStorage.getItem('cfgP')||'0d55bd98-dfdb-4357-8e7e-f863a0e60b75';
   fetch(BASE+'/dgrv4/ssotoken/smart/token',{
-    method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},
-    body:'grant_type=client_credentials&client_id='+encodeURIComponent(cid)+'&client_secret=79f04b56b33491716c0880af72cdef7d3f0629111421cedd18353651cd313d9e'
+    method:'POST',
+    headers:{'Content-Type':'application/x-www-form-urlencoded','Authorization':'Basic '+btoa(cid+':'+btoa('79f04b56b33491716c0880af72cdef7d3f0629111421cedd18353651cd313d9e'))},
+    body:'grant_type=client_credentials'
   }).then(function(r){return r.json()}).then(function(tok){
     if(!tok.access_token)throw new Error('No token: '+JSON.stringify(tok));
     var hdr={Authorization:'Bearer '+tok.access_token};
