@@ -54,6 +54,7 @@
     sessionStorage.setItem('uname', name);
     document.getElementById('userArea').hidden = false;
     document.getElementById('userName').textContent = name;
+    renderDoctorCard();
   }
 
   // ===== Token (client_credentials) =====
@@ -298,7 +299,7 @@
   }
 
   // ===== Doctor card =====
-  function renderDoctorCard() {
+  window.renderDoctorCard = function() {
     var name = sessionStorage.getItem('uname') || 'Clinician';
     var email = sessionStorage.getItem('uemail') || '';
     var avatarUrl = 'https://api.dicebear.com/9.x/notionists/svg?seed=' + encodeURIComponent(name) + '&backgroundColor=1565c0&backgroundType=solid';
