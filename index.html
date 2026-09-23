@@ -1,290 +1,178 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CDS Hooks — Demo &amp; Documentation</title>
-  <style>
-    :root {
-      --c-bg: #f8f9fa;
-      --c-surface: #ffffff;
-      --c-text: #1a1a2e;
-      --c-muted: #6c757d;
-      --c-accent: #0d6efd;
-      --c-accent-light: #e7f1ff;
-      --c-border: #dee2e6;
-      --c-code-bg: #f1f3f5;
-      --radius: 8px;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --c-bg: #0d1117;
-        --c-surface: #161b22;
-        --c-text: #e6edf3;
-        --c-muted: #8b949e;
-        --c-accent: #58a6ff;
-        --c-accent-light: #1a2332;
-        --c-border: #30363d;
-        --c-code-bg: #1c2128;
-      }
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
-      background: var(--c-bg);
-      color: var(--c-text);
-      line-height: 1.6;
-    }
-
-    /* Header */
-    .hero {
-      background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
-      color: #fff;
-      padding: 3rem 1.5rem;
-      text-align: center;
-    }
-    @media (prefers-color-scheme: dark) {
-      .hero { background: linear-gradient(135deg, #1a3a5c 0%, #0d1f3c 100%); }
-    }
-    .hero h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: .5rem; }
-    .hero p { font-size: 1.1rem; opacity: .9; max-width: 600px; margin: 0 auto; }
-
-    /* Container */
-    .container { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem; }
-
-    /* Cards */
-    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
-    .card {
-      background: var(--c-surface);
-      border: 1px solid var(--c-border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      transition: box-shadow .2s;
-    }
-    .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.08); }
-    .card h3 { font-size: 1.1rem; margin-bottom: .5rem; display: flex; align-items: center; gap: .5rem; }
-    .card p { color: var(--c-muted); font-size: .95rem; }
-
-    /* Section */
-    section { margin-bottom: 2.5rem; }
-    section h2 {
-      font-size: 1.4rem;
-      margin-bottom: 1rem;
-      padding-bottom: .5rem;
-      border-bottom: 2px solid var(--c-accent);
-      display: inline-block;
-    }
-
-    /* Table */
-    table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .95rem; }
-    th, td { padding: .75rem 1rem; text-align: left; border-bottom: 1px solid var(--c-border); }
-    th { background: var(--c-accent-light); font-weight: 600; }
-    tr:hover td { background: var(--c-accent-light); }
-
-    /* Code */
-    pre {
-      background: var(--c-code-bg);
-      border: 1px solid var(--c-border);
-      border-radius: var(--radius);
-      padding: 1rem 1.25rem;
-      overflow-x: auto;
-      font-size: .875rem;
-      line-height: 1.5;
-    }
-    code { font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace; }
-    p code, li code {
-      background: var(--c-code-bg);
-      padding: .15rem .4rem;
-      border-radius: 4px;
-      font-size: .9em;
-    }
-
-    /* Badge */
-    .badge {
-      display: inline-block;
-      font-size: .75rem;
-      font-weight: 600;
-      padding: .2rem .6rem;
-      border-radius: 12px;
-      background: var(--c-accent);
-      color: #fff;
-    }
-
-    /* Footer */
-    footer {
-      text-align: center;
-      padding: 2rem 1.5rem;
-      color: var(--c-muted);
-      font-size: .85rem;
-      border-top: 1px solid var(--c-border);
-    }
-    footer a { color: var(--c-accent); text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
-
-    /* Link */
-    a { color: var(--c-accent); }
-
-    /* Responsive */
-    @media (max-width: 600px) {
-      .hero h1 { font-size: 1.6rem; }
-      .hero p { font-size: 1rem; }
-      pre { font-size: .8rem; }
-    }
-  </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>DigiCare CDS</title>
+<script src="https://cdn.jsdelivr.net/npm/fhirclient/build/fhir-client.js"></script>
+<style>
+:root{--p:#1565c0;--pd:#0d47a1;--bg:#e8eef5;--s:#fff;--t:#1a1a2e;--m:#6c757d;--b:#dee2e6;--ok:#2e7d32;--r:10px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Noto Sans TC',sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
+.topbar{background:var(--p);color:#fff;padding:1rem 2rem;display:flex;align-items:center;gap:1rem;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.topbar .logo{width:44px;height:44px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem}
+.topbar h1{font-size:1.25rem;font-weight:600}
+.topbar .sub{font-size:.8rem;opacity:.8}
+.topbar .right{margin-left:auto;font-size:.85rem}
+.ct{max-width:960px;margin:0 auto;padding:2rem 1.5rem}
+.card{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.card h2{font-size:1.15rem;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid var(--p);color:var(--p)}
+.ls{text-align:center;padding:2rem}
+.ls p{color:var(--m);margin-bottom:1.5rem;line-height:1.6}
+.lb{display:inline-flex;align-items:center;gap:.6rem;background:var(--p);color:#fff;border:none;padding:.85rem 2rem;border-radius:8px;font-size:1.05rem;font-weight:600;cursor:pointer;transition:all .2s}
+.lb:hover{background:var(--pd);box-shadow:0 4px 12px rgba(21,101,192,.3)}
+.lb:disabled{opacity:.5;cursor:not-allowed}
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem}
+.cg label{font-size:.8rem;color:var(--m);display:block;margin-bottom:.25rem}
+.cg input{width:100%;padding:.5rem .75rem;border:1px solid var(--b);border-radius:6px;font-size:.85rem;font-family:monospace}
+.ph{display:flex;align-items:center;gap:1.25rem}
+.av{width:72px;height:72px;border-radius:50%;background:var(--p);display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;font-weight:bold;flex-shrink:0}
+.pn{font-size:1.4rem;font-weight:bold}
+.pm{color:var(--m);font-size:.9rem;margin-top:.25rem}
+.ig{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.75rem;margin-top:1rem}
+.ii{background:var(--bg);padding:.75rem 1rem;border-radius:8px}
+.ii .il{font-size:.7rem;color:var(--m);text-transform:uppercase;margin-bottom:.2rem}
+.ii .iv{font-size:.95rem;font-weight:500}
+.tabs{display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap}
+.tab{padding:.5rem 1rem;border:none;background:#eee;border-radius:8px;cursor:pointer;font-size:.85rem}
+.tab:hover{background:#ddd}
+.tab.active{background:var(--p);color:#fff}
+.tc{display:none}
+.tc.active{display:block}
+.ml{list-style:none;padding:0}
+.mi{padding:.75rem 1rem;background:var(--bg);border-radius:8px;margin-bottom:.5rem;border-left:4px solid var(--p)}
+.mn{font-weight:bold;margin-bottom:.25rem}
+.md{font-size:.8rem;color:var(--m)}
+.nd{text-align:center;padding:2rem;color:var(--m);font-style:italic}
+.ds{font-family:monospace;font-size:.8rem;background:var(--bg);padding:1rem;border-radius:8px;max-height:400px;overflow:auto;white-space:pre-wrap;word-break:break-all}
+.sp{border:3px solid var(--b);border-top:3px solid var(--p);border-radius:50%;width:30px;height:30px;animation:sp 1s linear infinite;margin:0 auto 1rem}
+@keyframes sp{to{transform:rotate(360deg)}}
+.err{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:1rem;border-radius:8px}
+.sb{display:inline-block;background:#e8f5e9;color:var(--ok);padding:.3rem .8rem;border-radius:16px;font-size:.8rem;font-weight:500}
+.ft{text-align:center;padding:1.5rem;font-size:.75rem;color:var(--m)}
+[hidden]{display:none!important}
+@media(max-width:600px){.cg{grid-template-columns:1fr}.ph{flex-direction:column;text-align:center}.ig{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
-
-<div class="hero">
-  <h1>CDS Hooks</h1>
-  <p>Clinical Decision Support Hooks — 臨床決策支援服務展示與文件</p>
+<div class="topbar">
+<div class="logo">&#x2695;</div>
+<div><h1>DigiCare CDS</h1><div class="sub">Clinical Decision Support System</div></div>
+<div class="right" id="srvInfo"></div>
 </div>
 
-<div class="container">
-
-  <section>
-    <h2>Overview</h2>
-    <p>
-      <a href="https://cds-hooks.hl7.org/" target="_blank">CDS Hooks</a> 是 HL7 定義的標準，
-      讓 EHR（電子病歷系統）在臨床工作流程的關鍵時刻，向外部 CDS 服務發起即時查詢，
-      並將建議卡片（Card）回饋給臨床人員。本站提供本專案所實作之 CDS 服務的說明與範例。
-    </p>
-  </section>
-
-  <section>
-    <h2>Architecture</h2>
-    <div class="cards">
-      <div class="card">
-        <h3><span class="badge">EHR</span> Hook 觸發端</h3>
-        <p>在臨床流程觸發 hook（如 patient-view、order-select），
-           將 context 與 FHIR authorization 送往 CDS Service。</p>
-      </div>
-      <div class="card">
-        <h3><span class="badge">CDS</span> 決策服務</h3>
-        <p>接收 hook request，查詢 FHIR Server 取得病患資料，
-           執行 CQL 規則引擎，回傳決策建議卡片。</p>
-      </div>
-      <div class="card">
-        <h3><span class="badge">FHIR</span> 資料來源</h3>
-        <p>提供標準化病患資料（MedicationRequest、Condition 等），
-           供 CDS Service 進行臨床規則評估。</p>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <h2>Discovery Endpoint</h2>
-    <p>CDS Service 透過 <code>/cds-services</code> 端點公開可用的 hook 清單：</p>
-    <pre><code>GET /cds-services
-
-{
-  "services": [
-    {
-      "hook": "patient-view",
-      "id": "patient-greeting",
-      "title": "Patient Greeting",
-      "description": "顯示病患基本資訊與提示"
-    },
-    {
-      "hook": "order-select",
-      "id": "drug-interaction-check",
-      "title": "Drug Interaction Check",
-      "description": "檢查藥物交互作用並回傳警示卡片"
-    }
-  ]
-}</code></pre>
-  </section>
-
-  <section>
-    <h2>Hook Request / Response</h2>
-    <p>EHR 對指定 service 發送 POST 請求，CDS Service 回傳 Cards：</p>
-    <pre><code>POST /cds-services/drug-interaction-check
-Content-Type: application/json
-
-{
-  "hook": "order-select",
-  "hookInstance": "d1577c69-...",
-  "context": {
-    "userId": "Practitioner/123",
-    "patientId": "Patient/456",
-    "selections": ["MedicationRequest/789"]
-  },
-  "fhirServer": "https://fhir.example.com",
-  "fhirAuthorization": {
-    "access_token": "eyJ...",
-    "token_type": "Bearer",
-    "scope": "patient/*.read"
-  }
-}</code></pre>
-
-    <pre><code>// Response
-{
-  "cards": [
-    {
-      "uuid": "a1b2c3d4-...",
-      "summary": "潛在藥物交互作用",
-      "detail": "Warfarin 與 Aspirin 併用可能增加出血風險",
-      "indicator": "warning",
-      "source": { "label": "CDS Service" },
-      "suggestions": [
-        {
-          "label": "更換為替代藥物",
-          "actions": [...]
-        }
-      ]
-    }
-  ]
-}</code></pre>
-  </section>
-
-  <section>
-    <h2>Card Indicator</h2>
-    <table>
-      <thead>
-        <tr><th>Indicator</th><th>意義</th><th>使用時機</th></tr>
-      </thead>
-      <tbody>
-        <tr><td><code>info</code></td><td>資訊提示</td><td>一般參考資訊，不需立即處理</td></tr>
-        <tr><td><code>warning</code></td><td>警告</td><td>需要臨床人員注意但非緊急</td></tr>
-        <tr><td><code>critical</code></td><td>嚴重警示</td><td>須立即處理的安全問題</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section>
-    <h2>References</h2>
-    <table>
-      <thead>
-        <tr><th>Resource</th><th>Link</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>CDS Hooks Specification</td>
-          <td><a href="https://cds-hooks.hl7.org/" target="_blank">cds-hooks.hl7.org</a></td>
-        </tr>
-        <tr>
-          <td>HL7 FHIR</td>
-          <td><a href="https://hl7.org/fhir/" target="_blank">hl7.org/fhir</a></td>
-        </tr>
-        <tr>
-          <td>CDS Hooks Sandbox</td>
-          <td><a href="https://sandbox.cds-hooks.org/" target="_blank">sandbox.cds-hooks.org</a></td>
-        </tr>
-        <tr>
-          <td>SMART on FHIR</td>
-          <td><a href="https://smarthealthit.org/" target="_blank">smarthealthit.org</a></td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
+<div class="ct" id="lv">
+<div class="card">
+<h2>EHR Launch</h2>
+<div class="ls">
+<p>SMART on FHIR EHR Launch Demo</p>
+<div class="cg" style="max-width:500px;margin:0 auto 1.5rem;text-align:left">
+<div><label>Patient ID</label><input id="cfgP" value="0d55bd98-dfdb-4357-8e7e-f863a0e60b75"></div>
+<div><label>Provider ID</label><input id="cfgR" value="429bf6ab-be0d-4b37-aaa0-f95e45762095"></div>
+<div><label>Client ID</label><input id="cfgC" value="cc344727-6f90-496c-94fd-c7829aa9a51d"></div>
+<div><label>User Type</label><input id="cfgU" value="practitioner"></div>
+</div>
+<button class="lb" onclick="doLaunch()">EHR Launch</button>
+<p id="lstat" style="margin-top:1rem;font-size:.85rem"></p>
+</div>
+</div>
+<div class="card">
+<h2>Links</h2>
+<ul style="padding-left:1.5rem;line-height:2">
+<li><a href="https://cds-hooks.hl7.org/" target="_blank">CDS Hooks Spec</a></li>
+<li><a href="https://hl7.org/fhir/" target="_blank">HL7 FHIR</a></li>
+<li><a href="cors-test.html">CORS Test</a></li>
+</ul>
+</div>
 </div>
 
-<footer>
-  <p>
-    CDS Hooks Demo &amp; Documentation &mdash;
-    <a href="https://github.com/KevinChengTpisoftware/cdsHooksDan" target="_blank">GitHub Repository</a>
-  </p>
-</footer>
+<div class="ct" id="av" hidden>
+<div class="card"><h2>Patient</h2><div id="pi"><div style="text-align:center;padding:2rem"><div class="sp"></div></div></div></div>
+<div class="card">
+<div class="tabs">
+<button class="tab active" data-tab="med">Medications</button>
+<button class="tab" data-tab="cond">Conditions</button>
+<button class="tab" data-tab="obs">Observations</button>
+<button class="tab" data-tab="raw">Raw JSON</button>
+</div>
+<div id="med" class="tc active"><div style="text-align:center;padding:2rem"><div class="sp"></div></div></div>
+<div id="cond" class="tc"><div style="text-align:center;padding:2rem"><div class="sp"></div></div></div>
+<div id="obs" class="tc"><div style="text-align:center;padding:2rem"><div class="sp"></div></div></div>
+<div id="raw" class="tc"><div class="ds" id="rd">...</div></div>
+</div>
+</div>
 
+<div class="ft">DigiCare CDS - SMART on FHIR Demo</div>
+<script>
+var BASE='https://dgcare-dev.eapdd.tpisoftware.com';
+var ISS=BASE+'/smart-on-fhir/hapiTw';
+
+function doLaunch(){
+var b=document.querySelector('.lb');var st=document.getElementById('lstat');
+b.disabled=true;st.textContent='Requesting launch code...';
+var body='client_id='+encodeURIComponent(document.getElementById('cfgC').value)
++'&patient='+encodeURIComponent(document.getElementById('cfgP').value)
++'&provider='+encodeURIComponent(document.getElementById('cfgR').value)
++'&user_type='+encodeURIComponent(document.getElementById('cfgU').value);
+fetch(BASE+'/dgrv4/ssotoken/smart/launch',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body})
+.then(function(r){return r.json()})
+.then(function(d){
+if(!d.launch)throw new Error('No launch code: '+JSON.stringify(d));
+st.textContent='Launch: '+d.launch+' - Redirecting...';
+window.location.href='launch.html?iss='+encodeURIComponent(ISS)+'&launch='+encodeURIComponent(d.launch);
+})
+.catch(function(e){st.innerHTML='<span style="color:#c62828">'+e.message+'</span>';b.disabled=false;});
+}
+
+document.querySelectorAll('.tab').forEach(function(t){
+t.addEventListener('click',function(){
+document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active')});
+document.querySelectorAll('.tc').forEach(function(x){x.classList.remove('active')});
+this.classList.add('active');
+document.getElementById(this.dataset.tab).classList.add('active');
+});
+});
+
+function fd(d){if(!d)return'N/A';try{return new Date(d).toLocaleDateString('zh-TW')}catch(e){return d}}
+function age(b){if(!b)return'N/A';return(new Date().getFullYear()-new Date(b).getFullYear())+' y/o'}
+function gn(p){if(!p.name||!p.name.length)return'Unknown';var n=p.name[0];if(n.text)return n.text;var r=[];if(n.family)r.push(n.family);if(n.given)r=r.concat(n.given);return r.join(' ')||'Unknown'}
+
+function rp(p){
+var n=gn(p);
+document.getElementById('pi').innerHTML=
+'<div class="ph"><div class="av">'+n.charAt(0)+'</div><div><div class="pn">'+n+'</div><div class="pm">ID: '+(p.id||'N/A')+'</div></div></div>'+
+'<div class="ig">'+
+'<div class="ii"><div class="il">Birthday</div><div class="iv">'+fd(p.birthDate)+'</div></div>'+
+'<div class="ii"><div class="il">Age</div><div class="iv">'+age(p.birthDate)+'</div></div>'+
+'<div class="ii"><div class="il">Gender</div><div class="iv">'+(p.gender||'N/A')+'</div></div>'+
+'</div>';
+}
+
+function rl(cid,entries,nf,df){
+var c=document.getElementById(cid);
+if(!entries||!entries.length){c.innerHTML='<div class="nd">No records</div>';return}
+var h='<ul class="ml">';
+entries.forEach(function(e){h+='<li class="mi"><div class="mn">'+nf(e.resource)+'</div><div class="md">'+df(e.resource)+'</div></li>'});
+c.innerHTML=h+'</ul>';
+}
+
+var ps=new URLSearchParams(window.location.search);
+if(ps.has('code')||ps.has('state')){
+document.getElementById('lv').hidden=true;
+document.getElementById('av').hidden=false;
+FHIR.oauth2.ready().then(function(cl){
+document.getElementById('srvInfo').innerHTML='<span class="sb">Connected</span> '+(cl.state.serverUrl||'');
+cl.patient.read().then(function(p){rp(p);document.getElementById('rd').textContent=JSON.stringify(p,null,2)},function(e){document.getElementById('pi').innerHTML='<div class="err">'+e.message+'</div>'});
+cl.request('/MedicationRequest?patient='+cl.patient.id).then(function(d){
+rl('med',d.entry,function(r){return(r.medicationCodeableConcept&&(r.medicationCodeableConcept.text||(r.medicationCodeableConcept.coding&&r.medicationCodeableConcept.coding[0].display)))||'Unknown'},
+function(r){return'Status: '+(r.status||'N/A')+' | '+fd(r.authoredOn)})},function(e){document.getElementById('med').innerHTML='<div class="err">'+e.message+'</div>'});
+cl.request('/Condition?patient='+cl.patient.id).then(function(d){
+rl('cond',d.entry,function(r){return(r.code&&(r.code.text||(r.code.coding&&r.code.coding[0]&&r.code.coding[0].display)))||'Unknown'},
+function(r){var s=r.clinicalStatus&&r.clinicalStatus.coding&&r.clinicalStatus.coding[0]?r.clinicalStatus.coding[0].code:'N/A';return'Status: '+s+' | '+fd(r.onsetDateTime)})},function(e){document.getElementById('cond').innerHTML='<div class="err">'+e.message+'</div>'});
+cl.request('/Observation?patient='+cl.patient.id+'&_count=20').then(function(d){
+rl('obs',d.entry,function(r){return(r.code&&(r.code.text||(r.code.coding&&r.code.coding[0]&&r.code.coding[0].display)))||'Unknown'},
+function(r){var v='N/A';if(r.valueQuantity)v=r.valueQuantity.value+' '+(r.valueQuantity.unit||'');else if(r.valueString)v=r.valueString;return'Value: '+v+' | '+fd(r.effectiveDateTime)})},function(e){document.getElementById('obs').innerHTML='<div class="err">'+e.message+'</div>'});
+}).catch(function(e){document.getElementById('av').innerHTML='<div class="card"><div class="err"><h3>Auth Failed</h3><p>'+e.message+'</p><p><a href="index.html">Back</a></p></div></div>'});
+}
+</script>
 </body>
 </html>
