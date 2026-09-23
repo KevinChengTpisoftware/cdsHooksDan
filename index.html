@@ -126,11 +126,11 @@ var tokenClient=null;
 
 window.onload=function(){
   if(typeof google==='undefined')return;
-  google.accounts.id.initialize({client_id:GCID,callback:onCred,auto_select:false});
+  google.accounts.id.initialize({client_id:GCID,callback:onCred,auto_select:true});
   try{tokenClient=google.accounts.oauth2.initTokenClient({client_id:GCID,scope:'openid profile email',callback:''});}catch(e){}
-  if(sessionStorage.getItem('ehr_launched')){restoreUser();showStage(3);fetchData();sessionStorage.removeItem('ehr_launched');return;}
+  if(sessionStorage.getItem('ehr_launched')){restoreUser();showStage(3);fetchData();sessionStorage.removeItem('ehr_launched');google.accounts.id.prompt();return;}
   var ps=new URLSearchParams(location.search);
-  if(ps.has('code')||ps.has('state')){restoreUser();showStage(3);fetchData();return;}
+  if(ps.has('code')||ps.has('state')){restoreUser();showStage(3);fetchData();google.accounts.id.prompt();return;}
   if(sessionStorage.getItem('uname')){restoreUser();showStage(2);}
 };
 
@@ -153,7 +153,8 @@ function onCred(response){
   var raw=atob(b);var bytes=new Uint8Array(raw.length);
   for(var i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
   var p=JSON.parse(new TextDecoder().decode(bytes));
-  saveUser(p.name,p.email,p.picture);doLaunch();
+  saveUser(p.name,p.email,p.picture);
+  if(!document.getElementById('stage1').hidden)doLaunch();
 }
 function saveUser(n,e,pic){
   sessionStorage.setItem('uname',n);sessionStorage.setItem('uemail',e);sessionStorage.setItem('upic',pic);
