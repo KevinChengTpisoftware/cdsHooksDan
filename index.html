@@ -26,6 +26,13 @@
 
 <script src="config.js"></script>
 <script>
+(function(){
+  var ps = new URLSearchParams(location.search);
+  if (ps.has('code') || ps.has('state')) {
+    location.replace('app.html' + location.search);
+    return;
+  }
+})();
 function doLogin() {
   var btn = document.getElementById('loginBtn');
   var status = document.getElementById('loginStatus');
