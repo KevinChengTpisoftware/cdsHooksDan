@@ -304,11 +304,15 @@
     var avatarUrl = 'https://api.dicebear.com/9.x/notionists/svg?seed=' + encodeURIComponent(name) + '&backgroundColor=e8eef5';
     var el = document.getElementById('doctorCard');
     if (!el) return;
+    var titles=['\u4e3b\u6cbb\u91ab\u5e2b','\u4e3b\u4efb\u91ab\u5e2b','\u4f4f\u9662\u91ab\u5e2b','\u5c08\u79d1\u8b77\u7406\u5e2b','\u8cc7\u6df1\u4e3b\u6cbb\u91ab\u5e2b'];
+    var depts=['\u4e00\u822c\u5167\u79d1','\u5fc3\u81df\u5167\u79d1','\u80f8\u8154\u5916\u79d1','\u795e\u7d93\u5167\u79d1','\u6025\u8a3a\u91ab\u5b78\u79d1','\u5bb6\u5ead\u91ab\u5b78\u79d1','\u5c0f\u5152\u79d1','\u9aa8\u79d1'];
+    var h=0;for(var ci=0;ci<name.length;ci++)h=((h<<5)-h)+name.charCodeAt(ci);h=Math.abs(h);
+    var title=titles[h%titles.length];
+    var dept=depts[(h>>>4)%depts.length];
     el.innerHTML = '<img src="' + avatarUrl + '" alt="">'
       + '<div class="doctor-info">'
       + '<div class="doctor-name">' + escHtml(name) + '</div>'
-      + '<div class="doctor-role">' + escHtml(email) + '</div>'
-      + '<div class="doctor-dept">\u4e3b\u6cbb\u91ab\u5e2b \u00b7 \u4e00\u822c\u5167\u79d1</div>'
+      + '<div class="doctor-role">' + escHtml(title) + ' \u00b7 ' + escHtml(dept) + '</div>'
       + '<div class="doctor-status"><span class="dot"></span> \u7dda\u4e0a</div>'
       + '</div>';
   }
