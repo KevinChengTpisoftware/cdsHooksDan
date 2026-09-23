@@ -299,28 +299,26 @@ body {
 
 /* Doctor info card (right panel top) */
 .doctor-card {
-  padding: 1rem;
+  padding: 1.25rem;
   border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: .75rem;
+  display: flex; align-items: center; gap: 1rem;
 }
 .doctor-card img {
-  width: 56px; height: 56px; border-radius: 12px;
+  width: 84px; height: 84px; border-radius: 16px;
   border: 2px solid var(--accent-ok); background: var(--bg-card);
-  object-fit: cover;
+  object-fit: cover; flex-shrink: 0;
 }
 .doctor-card .doctor-info { flex: 1; }
-.doctor-card .doctor-name { font-size: .9rem; font-weight: 600; }
-.doctor-card .doctor-role { font-size: .7rem; color: var(--text-muted); }
+.doctor-card .doctor-name { font-size: 1.05rem; font-weight: 700; }
+.doctor-card .doctor-role { font-size: .8rem; color: var(--text-muted); margin-top: .15rem; }
+.doctor-card .doctor-dept { font-size: .75rem; color: var(--text-muted); margin-top: .1rem; }
 .doctor-card .doctor-status {
   display: flex; align-items: center; gap: .35rem;
-  font-size: .7rem; color: var(--accent-ok); margin-top: .2rem;
+  font-size: .75rem; color: var(--accent-ok); margin-top: .35rem;
 }
 .doctor-card .doctor-status .dot {
-  width: 6px; height: 6px; border-radius: 50%;
+  width: 7px; height: 7px; border-radius: 50%;
   background: var(--accent-ok);
 }
 
-/* Topbar avatar larger */
-.app-topbar .user-area img {
-  width: 34px; height: 34px; border-radius: 10px;
-}
+

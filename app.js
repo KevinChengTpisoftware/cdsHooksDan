@@ -54,8 +54,6 @@
     sessionStorage.setItem('uname', name);
     document.getElementById('userArea').hidden = false;
     document.getElementById('userName').textContent = name;
-    document.getElementById('userAvatar').src =
-      'https://api.dicebear.com/9.x/notionists/svg?seed=' + encodeURIComponent(name) + '&backgroundColor=1565c0&backgroundType=solid';
   }
 
   // ===== Token (client_credentials) =====
@@ -309,8 +307,9 @@
     el.innerHTML = '<img src="' + avatarUrl + '" alt="">'
       + '<div class="doctor-info">'
       + '<div class="doctor-name">' + escHtml(name) + '</div>'
-      + '<div class="doctor-role">Attending Physician</div>'
-      + '<div class="doctor-status"><span class="dot"></span> Online</div>'
+      + '<div class="doctor-role">' + escHtml(email) + '</div>'
+      + '<div class="doctor-dept">\u4e3b\u6cbb\u91ab\u5e2b \u00b7 \u4e00\u822c\u5167\u79d1</div>'
+      + '<div class="doctor-status"><span class="dot"></span> \u7dda\u4e0a</div>'
       + '</div>';
   }
 
