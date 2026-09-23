@@ -50,11 +50,12 @@
   }
 
   function showUser(name, email) {
+    sessionStorage.setItem('uemail', email);
     sessionStorage.setItem('uname', name);
     document.getElementById('userArea').hidden = false;
     document.getElementById('userName').textContent = name;
     document.getElementById('userAvatar').src =
-      'https://api.dicebear.com/9.x/personas/svg?seed=' + encodeURIComponent(name) + '&backgroundColor=1565c0';
+      'https://api.dicebear.com/9.x/notionists/svg?seed=' + encodeURIComponent(name) + '&backgroundColor=1565c0&backgroundType=solid';
   }
 
   // ===== Token (client_credentials) =====
@@ -76,6 +77,7 @@
       if (!tok.access_token) throw new Error('No token: ' + JSON.stringify(tok));
       accessToken = tok.access_token;
       resolveServerUrl();
+      renderDoctorCard();
       loadPatients();
     })
     .catch(function(e) {
@@ -119,7 +121,7 @@
       var name = getPatientName(p);
       var isActive = p.id === launchPatientId;
       html += '<div class="patient-item' + (isActive ? ' active' : '') + '" data-id="' + p.id + '" onclick="window._selectPatient(\'' + p.id + '\')">'
-        + '<img src="https://api.dicebear.com/9.x/adventurer/svg?seed=' + encodeURIComponent(p.id) + '&backgroundColor=b6e3f4" alt="">'
+        + '<img src="https://api.dicebear.com/9.x/avataaars/svg?seed=' + encodeURIComponent(p.id) + '&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,d1d4f9" alt="">'
         + '<div class="patient-info">'
         + '<div class="patient-name">' + escHtml(name) + '</div>'
         + '<div class="patient-id">' + escHtml(p.id) + '</div>'
@@ -144,20 +146,20 @@
   function loadPatientDetail(patient) {
     var center = document.getElementById('centerPanel');
     var name = getPatientName(patient);
-    var avatarUrl = 'https://api.dicebear.com/9.x/adventurer/svg?seed=' + encodeURIComponent(patient.id) + '&backgroundColor=b6e3f4';
+    var avatarUrl = 'https://api.dicebear.com/9.x/avataaars/svg?seed=' + encodeURIComponent(patient.id) + '&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,d1d4f9';
 
     var html = '<div class="detail-card">'
       + '<div class="patient-summary">'
-      + '<img src="' + avatarUrl + '" alt="">'
-      + '<div><div class="name">' + escHtml(name) + '</div>'
-      + '<div class="meta">ID: ' + escHtml(patient.id) + '</div></div>'
-      + '</div>'
+      + '<div class="avatar-side"><img src="' + avatarUrl + '" alt=""></div>'
+      + '<div class="info-side">'
+      + '<div class="name">' + escHtml(name) + '</div>'
+      + '<div class="meta">ID: ' + escHtml(patient.id) + '</div>'
       + '<div class="info-grid">'
       + infoBox('Birthday', formatDate(patient.birthDate))
       + infoBox('Age', calcAge(patient.birthDate))
       + infoBox('Gender', patient.gender || 'N/A')
       + infoBox('Phone', getPhone(patient))
-      + '</div></div>';
+      + '</div></div></div></div>';
 
     html += '<div class="detail-card">'
       + '<div class="tabs">'
@@ -295,6 +297,21 @@
     var d = document.createElement('div');
     d.textContent = String(s);
     return d.innerHTML;
+  }
+
+  // ===== Doctor card =====
+  function renderDoctorCard() {
+    var name = sessionStorage.getItem('uname') || 'Clinician';
+    var email = sessionStorage.getItem('uemail') || '';
+    var avatarUrl = 'https://api.dicebear.com/9.x/notionists/svg?seed=' + encodeURIComponent(name) + '&backgroundColor=1565c0&backgroundType=solid';
+    var el = document.getElementById('doctorCard');
+    if (!el) return;
+    el.innerHTML = '<img src="' + avatarUrl + '" alt="">'
+      + '<div class="doctor-info">'
+      + '<div class="doctor-name">' + escHtml(name) + '</div>'
+      + '<div class="doctor-role">Attending Physician</div>'
+      + '<div class="doctor-status"><span class="dot"></span> Online</div>'
+      + '</div>';
   }
 
   // ===== Logout =====

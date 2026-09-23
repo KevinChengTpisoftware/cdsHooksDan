@@ -165,17 +165,24 @@ body {
   border-bottom: 1px solid var(--border);
 }
 .patient-summary {
-  display: flex; align-items: center; gap: 1.25rem;
+  display: flex; align-items: stretch; gap: 1.25rem;
 }
-.patient-summary img {
-  width: 64px; height: 64px; border-radius: 50%;
+.patient-summary .avatar-side {
+  flex-shrink: 0;
+}
+.patient-summary .avatar-side img {
+  width: 140px; height: 140px; border-radius: 16px;
   border: 3px solid var(--primary); background: var(--bg-card);
+  object-fit: cover;
+}
+.patient-summary .info-side {
+  flex: 1; display: flex; flex-direction: column; gap: .5rem;
 }
 .patient-summary .name { font-size: 1.3rem; font-weight: 700; }
-.patient-summary .meta { font-size: .85rem; color: var(--text-muted); margin-top: .2rem; }
+.patient-summary .meta { font-size: .85rem; color: var(--text-muted); }
 .info-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: .6rem; margin-top: 1rem;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: .5rem;
 }
 .info-box {
   background: var(--bg-card); padding: .6rem .8rem;
@@ -288,4 +295,32 @@ body {
 @media (max-width: 700px) {
   .app-body { flex-direction: column; }
   .panel-left, .panel-right { width: 100%; min-width: auto; height: 200px; border: none; border-bottom: 1px solid var(--border); }
+}
+
+/* Doctor info card (right panel top) */
+.doctor-card {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: .75rem;
+}
+.doctor-card img {
+  width: 56px; height: 56px; border-radius: 12px;
+  border: 2px solid var(--accent-ok); background: var(--bg-card);
+  object-fit: cover;
+}
+.doctor-card .doctor-info { flex: 1; }
+.doctor-card .doctor-name { font-size: .9rem; font-weight: 600; }
+.doctor-card .doctor-role { font-size: .7rem; color: var(--text-muted); }
+.doctor-card .doctor-status {
+  display: flex; align-items: center; gap: .35rem;
+  font-size: .7rem; color: var(--accent-ok); margin-top: .2rem;
+}
+.doctor-card .doctor-status .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent-ok);
+}
+
+/* Topbar avatar larger */
+.app-topbar .user-area img {
+  width: 34px; height: 34px; border-radius: 10px;
 }
