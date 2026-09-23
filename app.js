@@ -52,8 +52,7 @@
   function showUser(name, email) {
     sessionStorage.setItem('uemail', email);
     sessionStorage.setItem('uname', name);
-    document.getElementById('userArea').hidden = false;
-    document.getElementById('userName').textContent = name;
+    document.getElementById('userArea').hidden = true;
     renderDoctorCard();
   }
 
@@ -302,7 +301,7 @@
   window.renderDoctorCard = function() {
     var name = sessionStorage.getItem('uname') || 'Clinician';
     var email = sessionStorage.getItem('uemail') || '';
-    var avatarUrl = 'https://api.dicebear.com/9.x/notionists/svg?seed=' + encodeURIComponent(name) + '&backgroundColor=1565c0&backgroundType=solid';
+    var avatarUrl = 'https://api.dicebear.com/9.x/notionists/svg?seed=' + encodeURIComponent(name) + '&backgroundColor=e8eef5';
     var el = document.getElementById('doctorCard');
     if (!el) return;
     el.innerHTML = '<img src="' + avatarUrl + '" alt="">'
