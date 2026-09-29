@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DigiCare Hospital</title>
+<link rel="stylesheet" href="styles.css?v=1790671926">
+</head>
+<body>
+<div class="login-page">
+  <div class="login-header">DigiCare Hospital &mdash; Clinical Decision Support System</div>
+  <div class="login-center">
+    <div class="login-card">
+      <div class="hospital-icon">&#x2695;</div>
+      <h1>DigiCare Hospital</h1>
+      <p class="subtitle">Clinical Decision Support System</p>
+      <button class="login-btn" id="loginBtn" onclick="doLogin()">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        Sign In
+      </button>
+      <div class="login-status" id="loginStatus"></div>
+      <div id="errorGuide" hidden style="text-align:left;margin-top:1.5rem;padding:1rem;background:#fff8f0;border:1px solid #ffe0b2;border-radius:8px;font-size:.82rem;color:#5d4037;line-height:1.6;">
+        <div style="font-weight:600;margin-bottom:.5rem;color:#e65100;">無法連線至伺服器</div>
+        <p style="margin-bottom:.5rem;">這通常是因為瀏覽器尚未信任伺服器的憑證。請依以下步驟操作：</p>
+        <ol style="padding-left:1.2rem;margin:0;">
+          <li>點擊開啟 <a href="#" id="trustLink1" target="_blank" style="color:#1565c0;font-weight:500;">伺服器 1</a>，選擇「進階」→「繼續前往（不安全）」</li>
+          <li id="trustStep2">點擊開啟 <a href="#" id="trustLink2" target="_blank" style="color:#1565c0;font-weight:500;">伺服器 2</a>，同樣操作</li>
+          <li>回到本頁，重新點擊「Sign In」</li>
+        </ol>
+        <div style="margin-top:.6rem;font-size:.75rem;color:#8d6e63;">每個瀏覽器設定檔只需執行一次。</div>
+      </div>
+    </div>
+  </div>
+  <div class="login-footer">Powered by SMART on FHIR &amp; CDS Hooks<br><span style="font-size:.65rem;opacity:.6">build 1790673151</span></div>
+</div>
+
+<script src="config.js?v=1790671926"></script>
+<script>
+(function(){
+  var ps = new URLSearchParams(location.search);
+  if (ps.has('code') || ps.has('state')) {
+    location.replace('app.html' + location.search);
+    return;
+  }
+})();
+function doLogin() {
+  var btn = document.getElementById('loginBtn');
+  var status = document.getElementById('loginStatus');
+  btn.disabled = true;
+  status.textContent = 'Connecting...';
+
+  var secret = CFG.CLIENT_SECRET;
+  var basicInner = btoa(secret);
+  var basicAuth = btoa(CFG.CLIENT_ID + ':' + basicInner);
+
+  var body = 'client_id=' + encodeURIComponent(CFG.CLIENT_ID)
+    + '&patient=' + encodeURIComponent(CFG.DEFAULT_PATIENT)
+    + '&provider=' + encodeURIComponent(CFG.DEFAULT_PROVIDER)
+    + '&user_type=practitioner';
+
+  fetch(CFG.BASE + '/dgrv4/ssotoken/smart/launch', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (!d.launch) throw new Error('Launch failed');
+    status.textContent = 'Redirecting...';
+    sessionStorage.setItem('ehr_launched', '1');
+    sessionStorage.setItem('cfgP', CFG.DEFAULT_PATIENT);
+    sessionStorage.setItem('cfgC', CFG.CLIENT_ID);
+    var iss = CFG.BASE + '/smart-on-fhir/digiCare/fhir';
+    window.location.href = 'launch.html?iss=' + encodeURIComponent(iss) + '&launch=' + encodeURIComponent(d.launch);
+  })
+  .catch(function(e) {
+    btn.disabled = false;
+    if (e.message === 'Failed to fetch') {
+      status.innerHTML = '<span style="color:#c62828;font-weight:600">無法連線至伺服器</span>';
+      var guide = document.getElementById('errorGuide');
+      if (guide) {
+        guide.hidden = false;
+        var tl1 = document.getElementById('trustLink1');
+        var tl2 = document.getElementById('trustLink2');
+        var step2 = document.getElementById('trustStep2');
+        if (tl1) { tl1.href = CFG.BASE; tl1.textContent = CFG.BASE.replace('https://',''); }
+        if (tl2 && CFG.CDS_BASE && CFG.CDS_BASE !== CFG.BASE) { tl2.href = CFG.CDS_BASE; tl2.textContent = CFG.CDS_BASE.replace('https://',''); }
+        else if (step2) { step2.hidden = true; }
+      }
+    } else {
+      status.innerHTML = '<span style="color:#c62828">' + e.message + '</span>';
+    }
+  });
+}
+</script>
+</body>
+</html>

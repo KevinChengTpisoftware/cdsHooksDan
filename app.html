@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DigiCare CDS</title>
+<link rel="stylesheet" href="styles.css?v=1790671926">
+<script src="https://cdn.jsdelivr.net/npm/fhirclient/build/fhir-client.js"></script>
+</head>
+<body>
+
+<div class="app-topbar">
+  <div class="logo">&#x2695;</div>
+  <span class="title">DigiCare CDS</span><span style="font-size:.6rem;color:var(--text-muted);margin-left:.5rem">1790671926</span>
+  <div class="spacer"></div>
+  <div class="user-area" id="userArea" hidden>
+    <span id="userName">-</span>
+    <button class="logout-btn" onclick="doLogout()">登出</button>
+  </div>
+</div>
+
+<div class="app-body">
+
+  <!-- Left: patient list -->
+  <div class="panel-left">
+    <div class="panel-header">病患清單</div>
+    <div class="patient-list" id="patientList">
+      <div class="loading-center"><div class="spinner"></div><p>載入中...</p></div>
+    </div>
+  </div>
+
+  <!-- Center: patient detail + action bar -->
+  <div class="panel-center" id="centerPanel">
+    <div class="center-content" id="centerContent">
+      <div class="loading-center" style="padding-top:20vh;">
+        <p>請從左側選擇病患</p>
+      </div>
+    </div>
+
+    <!-- Draft orders -->
+    <div class="draft-panel" id="draftPanel" hidden>
+      <div class="draft-header">本次醫囑（草稿）</div>
+      <div class="draft-list" id="draftList"></div>
+    </div>
+
+    <!-- Action bar -->
+    <div class="action-bar">
+      <button class="act-btn act-start" onclick="startVisit()">開始看診</button>
+      <div class="act-dropdown">
+        <button class="act-btn act-med">開立藥品 &#x25BC;</button>
+        <div class="act-dropdown-menu" id="drugMenu"></div>
+      </div>
+      <div class="act-dropdown">
+        <button class="act-btn act-lab">開立檢驗 &#x25BC;</button>
+        <div class="act-dropdown-menu" id="labMenu"></div>
+      </div>
+      <button class="act-btn act-sign" onclick="signOrder()">送出醫囑</button>
+      <button class="act-btn act-end" onclick="endVisit()">結束看診</button>
+    </div>
+  </div>
+
+  <!-- Right: doctor card + CDS chat -->
+  <div class="panel-right">
+    <div class="doctor-card" id="doctorCard"></div>
+    <div class="panel-header"><span class="dot"></span> 臨床決策卡片</div>
+    <div class="card-filter" id="cardFilter">
+      <button class="active" data-filter="all" onclick="window._filterCards('all',this)">全部</button>
+      <button data-filter="critical" onclick="window._filterCards('critical',this)">嚴重</button>
+      <button data-filter="warning" onclick="window._filterCards('warning',this)">警告</button>
+      <button data-filter="info" onclick="window._filterCards('info',this)">資訊</button>
+      <button data-filter="dismissed" onclick="window._filterCards('dismissed',this)">已消失</button>
+      <span class="filter-spacer"></span>
+      <span class="filter-count" id="cardCount">0</span>
+      <button data-filter="clear" onclick="window._clearCards()" style="color:var(--accent-crit)">清除</button>
+    </div>
+    <div class="chat-feed" id="chatFeed"></div>
+  </div>
+
+</div>
+
+<!-- Danmaku overlay -->
+<div class="danmaku-layer" id="danmakuLayer">
+  <div class="danmaku-controls">
+    <label>字體</label><input type="range" min="80" max="200" value="120" oninput="window._dmCtrl('size',this.value)">
+    <label>速度</label><input type="range" min="3" max="30" value="15" oninput="window._dmCtrl('speed',this.value)">
+    <label>透明</label><input type="range" min="30" max="100" value="100" oninput="window._dmCtrl('opacity',this.value)">
+    <button id="dmToggle" onclick="window._dmCtrl('toggle')">關閉彈幕</button>
+  </div>
+</div>
+
+<script src="config.js?v=1790671926"></script>
+<script src="app.js?v=1790671926"></script>
+</body>
+</html>
